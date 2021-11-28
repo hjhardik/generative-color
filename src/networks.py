@@ -105,7 +105,10 @@ class Generator(object):
 
                 # concat the layer from the contracting path with the output of the current layer
                 # concat only the channels (axis=3)
-                output = tf.concat([layers[len(layers) - index - 2], output], axis=3)
+                ip1 = layers[len(layers) - index - 2]
+                if tf.shape(ip1)!=tf.shape(output):
+                    tf.reshape(ip1, np.shape(output))
+                output = tf.concat([ip1, output], axis=3)
 
             output = conv2d(
                 inputs=output,

@@ -154,7 +154,6 @@ class TestDataset(BaseDataset):
         print(os.path.isfile(self.path))
         if os.path.isfile(self.path):
             data = [self.path]
-
         elif os.path.isdir(self.path):
             data = list(glob.glob(self.path + '/*.jpg')) + list(glob.glob(self.path + '/*.png'))
 

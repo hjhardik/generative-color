@@ -16,6 +16,7 @@ class BaseDataset():
         self.augment = augment and training
         self.training = training
         self.path = path
+        # print(path)
         self._data = []
 
     def __len__(self):
@@ -150,6 +151,7 @@ class TestDataset(BaseDataset):
 
     def load(self):
         print(self.path)
+        print(os.path.isfile(self.path))
         if os.path.isfile(self.path):
             data = [self.path]
 
@@ -157,7 +159,6 @@ class TestDataset(BaseDataset):
             data = list(glob.glob(self.path + '/*.jpg')) + list(glob.glob(self.path + '/*.png'))
 
         return data
-
 # python train.py \
 # #   --seed 100 \
 # #   --dataset cifar10 \
@@ -168,3 +169,8 @@ class TestDataset(BaseDataset):
 # #   --lr 1e-6 \
 # #   --lr-decay-steps 1e4 \
 # #   --augment True
+#
+# python test.py \
+#   --checkpoints-path ./checkpoints \        # checkpoints path
+#   --test-input ./checkpoints/test \         # test image(s) path
+#   --test-output ./checkpoints/output \      # output image(s) path

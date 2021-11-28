@@ -185,10 +185,9 @@ class BaseModel:
         # model input after preprocessing: LAB image
         self.input_color = preprocess(self.input_rgb, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
 
-        # test mode: model input is a graycale placeholder
+        # test mode: model input is a grayscale placeholder
         if self.options.mode == 1:
             self.input_gray = tf.placeholder(tf.float32, shape=(None, None, None, 1), name='input_gray')
-
         # train/turing-test we extract grayscale image from color image
         else:
             self.input_gray = tf.image.rgb_to_grayscale(self.input_rgb)
@@ -208,7 +207,8 @@ class BaseModel:
         self.gen_loss_gan = tf.reduce_mean(gen_ce)
         self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
         self.gen_loss = self.gen_loss_gan + self.gen_loss_l1
-
+        print("##########")
+        print(self.input_gray)
         self.sampler = tf.identity(gen_factory.create(self.input_gray, kernel, seed, reuse_variables=True), name='output')
         self.accuracy = pixelwise_accuracy(self.input_color, gen, self.options.color_space, self.options.acc_thresh)
         self.learning_rate = tf.constant(self.options.lr)
@@ -238,7 +238,7 @@ class BaseModel:
     def load(self):
         ckpt = tf.train.get_checkpoint_state(self.options.checkpoints_path)
         if ckpt is not None:
-            print('loading model...\n')
+            print('Loading model...\n')
             ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
             self.saver.restore(self.sess, os.path.join(self.options.checkpoints_path, ckpt_name))
             return True

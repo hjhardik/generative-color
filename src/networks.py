@@ -59,14 +59,10 @@ class Generator(object):
 
     def create(self, inputs, kernel_size=None, seed=None, reuse_variables=None):
         output = inputs
-
         with tf.variable_scope(self.name, reuse=reuse_variables):
-
             layers = []
-
             # encoder branch
             for index, kernel in enumerate(self.encoder_kernels):
-
                 name = 'conv' + str(index)
                 output = conv2d(
                     inputs=output,
@@ -77,17 +73,13 @@ class Generator(object):
                     activation=tf.nn.leaky_relu,
                     seed=seed
                 )
-
                 # save contracting path layers to be used for skip connections
                 layers.append(output)
-                
                 if kernel[2] > 0:
                     keep_prob = 1.0 - kernel[2] if self.training else 1.0
                     output = tf.nn.dropout(output, keep_prob=keep_prob, name='dropout_' + name, seed=seed)
-
             # decoder branch
             for index, kernel in enumerate(self.decoder_kernels):
-
                 name = 'deconv' + str(index)
                 output = conv2d_transpose(
                     inputs=output,
@@ -106,8 +98,7 @@ class Generator(object):
                 # concat the layer from the contracting path with the output of the current layer
                 # concat only the channels (axis=3)
                 ip1 = layers[len(layers) - index - 2]
-                if tf.shape(ip1)!=tf.shape(output):
-                    tf.reshape(ip1, np.shape(output))
+
                 output = tf.concat([ip1, output], axis=3)
 
             output = conv2d(

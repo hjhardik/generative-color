@@ -172,14 +172,13 @@ class BaseModel:
             return
 
         self.is_built = True
-
         gen_factory = self.create_generator()
         dis_factory = self.create_discriminator()
         smoothing = 0.9 if self.options.label_smoothing else 1
         seed = self.options.seed
         kernel = 4
 
-        # model input placeholder: RGB imaege
+        # model input placeholder: RGB image
         self.input_rgb = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb')
 
         # model input after preprocessing: LAB image
@@ -207,8 +206,7 @@ class BaseModel:
         self.gen_loss_gan = tf.reduce_mean(gen_ce)
         self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
         self.gen_loss = self.gen_loss_gan + self.gen_loss_l1
-        print("##########")
-        print(self.input_gray)
+
         self.sampler = tf.identity(gen_factory.create(self.input_gray, kernel, seed, reuse_variables=True), name='output')
         self.accuracy = pixelwise_accuracy(self.input_color, gen, self.options.color_space, self.options.acc_thresh)
         self.learning_rate = tf.constant(self.options.lr)

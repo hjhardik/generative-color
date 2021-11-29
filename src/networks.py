@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 from .ops import conv2d, conv2d_transpose, pixelwise_accuracy
 
-
 class Discriminator(object):
     def __init__(self, name, kernels, training=True):
         self.name = name
@@ -29,17 +28,19 @@ class Discriminator(object):
                     seed=seed
                 )
 
+                #indicates drop out layer: kernel[2]=0 means solid layer else denotes probability of dropping out
                 if kernel[2] > 0:
                     keep_prob = 1.0 - kernel[2] if self.training else 1.0
                     output = tf.nn.dropout(output, keep_prob=keep_prob, name='dropout_' + name, seed=seed)
 
+            #create last layer
             output = conv2d(
                 inputs=output,
                 name='conv_last',
                 filters=1,
-                kernel_size=4,                  # last layer kernel size = 4
-                strides=1,                      # last layer stride = 1
-                bnorm=False,                    # do not use batch-norm for the last layer
+                kernel_size=4,  # last layer kernel size = 4
+                strides=1,  # last layer stride = 1
+                bnorm=False,  # do not use batch-norm for the last layer
                 seed=seed
             )
 
@@ -78,6 +79,7 @@ class Generator(object):
                 if kernel[2] > 0:
                     keep_prob = 1.0 - kernel[2] if self.training else 1.0
                     output = tf.nn.dropout(output, keep_prob=keep_prob, name='dropout_' + name, seed=seed)
+
             # decoder branch
             for index, kernel in enumerate(self.decoder_kernels):
                 name = 'deconv' + str(index)
@@ -97,21 +99,19 @@ class Generator(object):
 
                 # concat the layer from the contracting path with the output of the current layer
                 # concat only the channels (axis=3)
-                ip1 = layers[len(layers) - index - 2]
+                ip_one = layers[len(layers) - index - 2]
+                output = tf.concat([ip_one, output], axis=3)
 
-                output = tf.concat([ip1, output], axis=3)
-
+            #last layer
             output = conv2d(
                 inputs=output,
                 name='conv_last',
-                filters=self.output_channels,   # number of output chanels
-                kernel_size=1,                  # last layer kernel size = 1
-                strides=1,                      # last layer stride = 1
-                bnorm=False,                    # do not use batch-norm for the last layer
-                activation=tf.nn.tanh,          # tanh activation function for the output
+                filters=self.output_channels,  # number of output chanels
+                kernel_size=1,  # last layer kernel size = 1
+                strides=1,  # last layer stride = 1
+                bnorm=False,  # do not use batch-norm for the last layer
+                activation=tf.nn.tanh,  # tanh activation function for the output
                 seed=seed
             )
-
             self.var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, self.name)
-
             return output

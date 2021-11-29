@@ -151,10 +151,11 @@ class TestDataset(BaseDataset):
 
     def load(self):
         print(self.path)
-        print(os.path.isfile(self.path))
         if os.path.isfile(self.path):
+            print("File Found !")
             data = [self.path]
         elif os.path.isdir(self.path):
+            print("Directory Found !")
             data = list(glob.glob(self.path + '/*.jpg')) + list(glob.glob(self.path + '/*.png'))
 
         return data

@@ -100,6 +100,7 @@ class Generator(object):
                 # concat the layer from the contracting path with the output of the current layer
                 # concat only the channels (axis=3)
                 ip_one = layers[len(layers) - index - 2]
+                ##three for loops to change the convert tensor values in ip_one to naother tensor of size = output
                 output = tf.concat([ip_one, output], axis=3)
 
             #last layer

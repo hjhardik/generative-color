@@ -109,3 +109,5 @@ vcs.xml
 .vscode
 /images
 /imgs
+/checkpoints
+/dataset
